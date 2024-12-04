@@ -1,0 +1,53 @@
+body {
+    font-family: "Bnazanin", sans-serif;
+    direction: rtl;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.nav-tabs .nav-link {
+    font-weight: bold;
+    text-align: center;
+}
+
+input, select, button {
+    border-radius: 5px !important;
+}
+
+.card {
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+    height: 100%; /* Ensures cards fill their container */
+}
+
+.card:hover {
+    transform: scale(1.03);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    color: #0056b3;
+    text-align: center; /* Center-align the text for uniformity */
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa; /* Light gray for row hover */
+}
+
+.btn-info {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+.btn-info:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}

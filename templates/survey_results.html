@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ survey_title }}</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Data Labels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+<body class="bg-light">
+    <div class="container my-5">
+        <div class="card shadow-sm p-4">
+            <h3 class="text-center mb-4" id="survey-title">{{ survey_title }}</h3>
+            <div class="d-flex justify-content-center align-items-center">
+                <div class="chart-container" style="width: 60%; max-width: 400px;">
+                    <canvas id="resultsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Display Labels with Vote Count and Percentages -->
+            <div class="mt-4">
+                <ul class="list-group">
+                    {% for label, vote, percentage, color in chart_data %}
+                    <li class="list-group-item d-flex align-items-center" style="background-color: {{ color }}; color: #fff;">
+                        {{ label }}: <span class="mx-2">{{ vote }} رأی</span> 
+                        <span class="mx-2">({{ percentage }}%)</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to convert English numbers to Persian numbers
+        function toPersianNumber(number) {
+            const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+            return number.toString().replace(/\d/g, (digit) => persianNumbers[digit]);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Data for the chart from Flask backend
+            const labels = {{ labels | tojson }};  // Dynamic options for the survey
+            const votes = {{ votes | tojson }};  // Dynamic vote counts for each option
+            const totalVotes = votes.reduce((a, b) => a + b, 0);  // Calculate total votes
+            const data = votes.map(vote => ((vote / totalVotes) * 100).toFixed(2));  // Calculate percentages
+            const colors = ['#4caf50', '#2196f3', '#ffc107', '#f44336'];  // Colors for each pie segment
+
+            // Create the chart
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'نتایج نظرسنجی',
+                        data: votes,
+                        backgroundColor: colors,
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false, // Hide the default legend
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    const index = tooltipItem.dataIndex;
+                                    const count = votes[index];
+                                    const percentage = data[index];
+                                    return `${labels[index]}: ${toPersianNumber(count)} رأی (${toPersianNumber(percentage)}%)`;
+                                }
+                            }
+                        },
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
